@@ -4,12 +4,12 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerPhotonManager : MonoBehaviourPunCallbacks
+public class PlayerNetworkManager : MonoBehaviourPunCallbacks
 {
     /// <summary>
     /// The user's local instance of the Photon networking manager. Each user will have only one of these loaded throughout the entire application.
     /// </summary>
-    public static PlayerPhotonManager Instance { get; private set; }
+    public static PlayerNetworkManager Instance { get; private set; }
 
     #region user instance identification public references
     /// <summary>
@@ -24,10 +24,6 @@ public class PlayerPhotonManager : MonoBehaviourPunCallbacks
     /// A unique ID that is generated randomly each time a user enters the application, to allow for distinguishing players with the same names.
     /// </summary>
     public string UniqueID { get { return _uniqueID; } }
-    /// <summary>
-    /// Whether or not the client is connected to the master server network.
-    /// </summary>
-    public bool IsConnected { get { return _isConnected; } }
     #endregion
 
     #region user instance identification internals
@@ -38,13 +34,36 @@ public class PlayerPhotonManager : MonoBehaviourPunCallbacks
     private string _username;
     [SerializeField]
     private string _uniqueID;
-    [SerializeField]
-    private bool _isConnected = false;
 
     #endregion
 
     #region photon variables
     RoomOptions _roomOptions = new RoomOptions();
+    #endregion
+
+    #region Photon callback delegates
+    public delegate void NetworkManagerEvent();
+
+    public static event NetworkManagerEvent RoomJoinFailed;
+    public static event NetworkManagerEvent RoomCreateFailed;
+    public static event NetworkManagerEvent ConnectedToMaster;
+
+    #endregion
+
+    #region networking info
+    /// <summary>
+    /// Whether or not the client is connected to the master server network.
+    /// </summary>
+    public bool IsConnected { get { return _isConnected; } }
+    /// <summary>
+    /// A string containing the last error given by Photon for specific circumstances, for use with debugging.
+    /// </summary>
+    public string LastPhotonError { get { return _lastPhotonError; } }
+    [Header("Networking information.")]
+    [SerializeField]
+    private bool _isConnected = false;
+    private string _lastPhotonError = null;
+
     #endregion
 
     private void Awake()
@@ -100,6 +119,12 @@ public class PlayerPhotonManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         _isConnected = true;
+        ConnectedToMaster?.Invoke();
+    }
+
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        base.OnCreateRoomFailed(returnCode, message);
     }
     #endregion
 }
