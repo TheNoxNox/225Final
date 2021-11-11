@@ -71,6 +71,7 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
         if (!Instance)
         {
             Instance = this;
+            DontDestroyOnLoad(this);
         }
         else
         {
@@ -79,6 +80,8 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
 
         PhotonNetwork.AutomaticallySyncScene = true;
         _roomOptions.MaxPlayers = 4;
+
+        _uniqueID = Random.Range(10000, 100000).ToString();
     }
 
     private void Start()
