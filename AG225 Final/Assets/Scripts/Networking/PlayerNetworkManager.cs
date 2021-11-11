@@ -37,6 +37,12 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
 
     #endregion
 
+    #region game scene string info
+
+    public string lobby = "Lobby";
+
+    #endregion
+
     #region photon variables
     RoomOptions _roomOptions = new RoomOptions();
     #endregion
@@ -62,6 +68,7 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
     [Header("Networking information.")]
     [SerializeField]
     private bool _isConnected = false;
+    [SerializeField]
     private string _lastPhotonError = null;
 
     #endregion
@@ -88,6 +95,18 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
     {
         Connect();
     }
+
+    #region external data modification interfaces
+
+    public void SetUsername(string uName)
+    {
+        if (!string.IsNullOrEmpty(uName))
+        {
+            _username = uName;         
+        }
+    }
+
+    #endregion
 
     #region networking methods
     private void Connect()
@@ -128,6 +147,20 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         base.OnCreateRoomFailed(returnCode, message);
+    }
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        RoomJoinFailed?.Invoke();
+        base.OnJoinRandomFailed(returnCode, message);
+    }
+
+    public override void OnJoinedRoom()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel(lobby);
+        }
     }
     #endregion
 }

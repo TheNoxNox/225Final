@@ -71,6 +71,10 @@ public class MainMenuManager : MonoBehaviour
     public Button joinLobbyButton;
     public Button exitGameButton;
     public Transform loadedCenter;
+    public TMP_Text menuInfo;
+
+    [Header("Username Input References")]
+    public TMP_InputField usernameInput;
 
     [Header("Loaded UI Intro Variables")]
     [Tooltip("The speed in degrees per second that the rotating elements of the UI will rotate at.")]
@@ -85,6 +89,9 @@ public class MainMenuManager : MonoBehaviour
         createLobbyButton.interactable = false;
         joinLobbyButton.interactable = false;
         exitGameButton.interactable = false;
+
+        usernameInput.gameObject.SetActive(false);
+        usernameInput.enabled = false;
 
         titleImage.transform.rotation = Quaternion.Euler(0, 90, 0);
         createLobbyButton.transform.position = new Vector3(createLobbyButton.transform.position.x + 1350,
@@ -148,11 +155,52 @@ public class MainMenuManager : MonoBehaviour
         createLobbyButton.interactable = true;
         joinLobbyButton.interactable = true;
         exitGameButton.interactable = true;
+
+        usernameInput.gameObject.SetActive(true);
+        usernameInput.enabled = true;
     }
 
     #endregion
 
     #endregion
+
+    #endregion
+
+
+    #region Game Beginning Methods
+
+    public void HostLobby()
+    {
+        if (HasValidUsername())
+        {
+            PlayerNetworkManager.Instance.CreateRoom();
+        }
+    }
+
+    public void JoinLobby()
+    {
+        if (HasValidUsername())
+        {
+            PlayerNetworkManager.Instance.JoinRandomRoom();
+        }
+    }
+
+    public bool HasValidUsername()
+    {
+        if (string.IsNullOrEmpty(usernameInput.text))
+        {
+            menuInfo.text = "You must enter a username!";
+            return false;
+        }
+
+        PlayerNetworkManager.Instance.SetUsername(usernameInput.text);
+        return true;
+    }
+
+    public void NoFoundRooms()
+    {
+        menuInfo.text = "No lobbies currently exist. Try hosting your own!";
+    }
 
     #endregion
 
@@ -178,6 +226,8 @@ public class MainMenuManager : MonoBehaviour
 
             PrepareMainMenuForIntro();
         }
+
+        PlayerNetworkManager.RoomJoinFailed += NoFoundRooms;
     }
 
     private void Update()
