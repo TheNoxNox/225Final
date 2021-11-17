@@ -53,6 +53,7 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
     public static event NetworkManagerEvent RoomJoinFailed;
     public static event NetworkManagerEvent RoomCreateFailed;
     public static event NetworkManagerEvent ConnectedToMaster;
+    public static event NetworkManagerEvent OnDisconnect;
 
     #endregion
 
@@ -78,7 +79,7 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
         if (!Instance)
         {
             Instance = this;
-            DontDestroyOnLoad(this);
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -146,6 +147,7 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
+        RoomCreateFailed?.Invoke();
         base.OnCreateRoomFailed(returnCode, message);
     }
 
@@ -161,6 +163,12 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.LoadLevel(lobby);
         }
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        OnDisconnect?.Invoke();
+        base.OnDisconnected(cause);
     }
     #endregion
 }

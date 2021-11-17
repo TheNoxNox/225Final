@@ -40,6 +40,12 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - ShowPlayerJoin
+  - AddPlayer
+  - RemovePlayer
+  - SendHostJoinNotification
+  - SendHostLeaveNotification
+  - AddPlayerCard
+  - RemovePlayerCard
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
