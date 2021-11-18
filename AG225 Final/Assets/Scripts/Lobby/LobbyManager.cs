@@ -12,22 +12,37 @@ public class LobbyManager : MonoBehaviour
     public static LobbyManager Instance;
 
 
-    public TMP_Text usernameTemp;
-
-    public TMP_Text userListTemp;
-
-    public List<PlayerCardDisplay> cardDisplays = new List<PlayerCardDisplay>();
 
     public List<LobbyPlayer> players = new List<LobbyPlayer>();
+
+    #region player card info
+
+    [Header("Player Card Info")]
+    public List<PlayerCardDisplay> cardDisplays = new List<PlayerCardDisplay>();
 
     public GameObject cardHolder;
 
     public GameObject playerCardPrefab;
 
+    #endregion
+
+    #region lobby info display
+
+    [Header("Lobby Info Display")]
+    public TMP_Text playerCounter;
+
+
+    #endregion
+
+    #region lobby info
+
     protected int playerCount = 0;
+    public int PlayerCount { get { return playerCount; } }
 
+    #endregion
+
+    [Header("Instantiation prefabs")]
     public GameObject gameInstancePrefab;
-
     public GameObject lobbyPlayerPrefab;
 
     private void Awake()
@@ -62,11 +77,19 @@ public class LobbyManager : MonoBehaviour
         //gameObject.GetPhotonView().RPC("ShowPlayerJoin", RpcTarget.AllBufferedViaServer, PlayerNetworkManager.Instance.Username);
     }
 
-    [PunRPC]
-    public void ShowPlayerJoin(string uName)
+    private void Update()
     {
-        userListTemp.text += "\n" + uName;
+        UpdatePlayerCount();
     }
+
+    #region UI update methods
+
+    private void UpdatePlayerCount()
+    {
+        playerCounter.text = "Players: " + playerCount;
+    }
+
+    #endregion
 
     #region host logic
 

@@ -49,9 +49,9 @@ public class GameInstance : MonoBehaviour
 
         IsHost = PhotonNetwork.IsMasterClient;
 
-        PlayerNetworkManager.OnDisconnect += PlayerLeaveLogic;
+        //PlayerNetworkManager.OnDisconnect += PlayerLeaveLogic;
 
-        PlayerJoinLogic();
+        //PlayerJoinLogic();
     }
 
     private void PlayerJoinLogic()

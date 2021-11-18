@@ -28,7 +28,7 @@ public class LobbyPlayer : MonoBehaviour
     {
         _username = username;
         _userID = id;
-        LobbyManager.Instance.AddPlayer(this);
+        myCard = LobbyManager.Instance.AddPlayer(this);
     }
 
     [PunRPC]

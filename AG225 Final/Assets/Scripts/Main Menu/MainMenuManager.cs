@@ -17,8 +17,8 @@ public class MainMenuManager : MonoBehaviour
     #region UI Logic Delegates
 
     public delegate void UILogicDelegate();
-    public static UILogicDelegate LoadingUI_Update;
-    public static UILogicDelegate LoadedUI_Update;
+    public UILogicDelegate LoadingUI_Update;
+    public UILogicDelegate LoadedUI_Update;
 
     #endregion
 
@@ -219,6 +219,8 @@ public class MainMenuManager : MonoBehaviour
         if (PlayerNetworkManager.Instance.IsConnected)
         {
             loadingUI.SetActive(false);
+            LoadingUI_Update = null;
+            LoadedUI_Update = null;
         }
         else
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 public class PlayerNetworkManager : MonoBehaviourPunCallbacks
 {
@@ -169,6 +170,12 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
     {
         OnDisconnect?.Invoke();
         base.OnDisconnected(cause);
+    }
+
+    public override void OnLeftRoom()
+    {
+        SceneManager.LoadScene("MainMenu");
+        base.OnLeftLobby();
     }
     #endregion
 }
