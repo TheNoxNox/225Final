@@ -185,6 +185,11 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+
     public bool HasValidUsername()
     {
         if (string.IsNullOrEmpty(usernameInput.text))
