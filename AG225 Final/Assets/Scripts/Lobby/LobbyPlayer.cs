@@ -19,8 +19,11 @@ public class LobbyPlayer : MonoBehaviour
 
     private void Awake()
     {
-        gameObject.GetPhotonView().RPC("PlayerJoin", RpcTarget.AllBufferedViaServer,
+        if (gameObject.GetPhotonView().IsMine)
+        {
+            gameObject.GetPhotonView().RPC("PlayerJoin", RpcTarget.AllBufferedViaServer,
             PlayerNetworkManager.Instance.Username, PlayerNetworkManager.Instance.UniqueID);
+        }       
     }
 
     [PunRPC]
