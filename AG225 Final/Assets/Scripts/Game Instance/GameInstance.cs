@@ -4,7 +4,6 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-[RequireComponent(typeof(PhotonView))]
 public class GameInstance : MonoBehaviour
 {
     public static GameInstance Instance;
@@ -19,10 +18,10 @@ public class GameInstance : MonoBehaviour
 
     #region host events
 
-    public delegate void PlayerEvent(string playerID);
+    //public delegate void PlayerEvent(string playerID);
 
-    public static event PlayerEvent OnPlayerJoin;
-    public static event PlayerEvent OnPlayerLeave;
+    //public static event PlayerEvent OnPlayerJoin;
+    //public static event PlayerEvent OnPlayerLeave;
 
     #endregion
 
@@ -31,6 +30,8 @@ public class GameInstance : MonoBehaviour
     #region personal information
 
     protected PlayerInfo myPlayerInfo;
+
+    public LobbyPlayer myLobbyPlayer;
 
     #endregion
 
@@ -55,13 +56,15 @@ public class GameInstance : MonoBehaviour
 
     private void PlayerJoinLogic()
     {
-        gameObject.GetPhotonView().RPC("AddPlayer", RpcTarget.AllBufferedViaServer,
-            PlayerNetworkManager.Instance.Username, PlayerNetworkManager.Instance.UniqueID);
+        //gameObject.GetPhotonView().RPC("AddPlayer", RpcTarget.AllBufferedViaServer,
+        //    PlayerNetworkManager.Instance.Username, PlayerNetworkManager.Instance.UniqueID);
+        AddPlayer(PlayerNetworkManager.Instance.Username, PlayerNetworkManager.Instance.UniqueID);
     }
 
     private void PlayerLeaveLogic()
     {
-        gameObject.GetPhotonView().RPC("RemovePlayer", RpcTarget.AllBufferedViaServer, PlayerNetworkManager.Instance.UniqueID);
+        //gameObject.GetPhotonView().RPC("RemovePlayer", RpcTarget.AllBufferedViaServer, PlayerNetworkManager.Instance.UniqueID);
+        RemovePlayer(PlayerNetworkManager.Instance.UniqueID);
         Destroy(this.gameObject);
     }
 
@@ -70,15 +73,14 @@ public class GameInstance : MonoBehaviour
         IsHost = PhotonNetwork.IsMasterClient;
     }
 
-    [PunRPC]
     public void AddPlayer(string uName, string uID)
     {
         myPlayerInfo = new PlayerInfo(uName, uID);
         players.Add(myPlayerInfo);
-        OnPlayerJoin?.Invoke(myPlayerInfo.UserID);
+        //OnPlayerJoin?.Invoke(myPlayerInfo.UserID);
+        //Debug.Log("AddPlayer called");
     }
 
-    [PunRPC]
     public void RemovePlayer(string uID)
     {
         foreach(PlayerInfo player in players)
@@ -86,7 +88,7 @@ public class GameInstance : MonoBehaviour
             if(player.UserID == uID)
             {
                 players.Remove(player);
-                OnPlayerLeave?.Invoke(myPlayerInfo.UserID);
+                //OnPlayerLeave?.Invoke(myPlayerInfo.UserID);
             }
         }
     }

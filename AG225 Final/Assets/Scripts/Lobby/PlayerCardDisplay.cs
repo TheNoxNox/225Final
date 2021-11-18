@@ -6,14 +6,13 @@ using TMPro;
 
 public class PlayerCardDisplay : MonoBehaviour
 {
-    public bool IsEmpty { get; private set; }
-
     public string Username { get; set; }
 
     public string CharacterID { get; set; }
 
+    public string PlayerID { get; set; }
+
     public Image characterImg;
-    public TMP_Text characterName;
 
     public TMP_Text usernameField;
 
@@ -25,6 +24,6 @@ public class PlayerCardDisplay : MonoBehaviour
 
     private void Update()
     {
-        
+        usernameField.text = Username;
     }
 }
