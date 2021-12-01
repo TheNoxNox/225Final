@@ -67,11 +67,18 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
     /// A string containing the last error given by Photon for specific circumstances, for use with debugging.
     /// </summary>
     public string LastPhotonError { get { return _lastPhotonError; } }
+    /// <summary>
+    /// An internal boolean that controls various debug-mode-only features for development. SHOULD BE FALSE WHEN BUILT.
+    /// </summary>
+    public bool IsTestingMode { get { return _isTestingMode; } }
+
     [Header("Networking information.")]
     [SerializeField]
     private bool _isConnected = false;
     [SerializeField]
     private string _lastPhotonError = null;
+    [SerializeField]
+    protected bool _isTestingMode = false;
 
     #endregion
 
@@ -91,6 +98,11 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
         _roomOptions.MaxPlayers = 4;
 
         _uniqueID = Random.Range(10000, 100000).ToString();
+
+        if (IsTestingMode)
+        {
+            Debug.LogWarning("WARNING: Game is in Testing mode. Switch this off for final builds.");
+        }
     }
 
     private void Start()
@@ -178,4 +190,35 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
         base.OnLeftLobby();
     }
     #endregion
+}
+
+
+public static class PhotonViewHelper
+{
+    /// <summary>
+    /// Extension method made for getting photonviews easier because calling gameobject.getphotonview all the time got annoying.
+    /// </summary>
+    /// <param name="mono"></param>
+    /// <returns>The photonview attached to this behavior's gameobject, or null if it doesn't have one.</returns>
+    public static PhotonView GetPhotonView(this MonoBehaviour mono)
+    {
+        return mono.gameObject.GetPhotonView();
+    }
+
+    /// <summary>
+    /// Extension method to shortcut gameobject.getphotonview().ismine;
+    /// </summary>
+    /// <param name="mono"></param>
+    /// <returns>True if photonview is owned by current player, false if not owned or doesn't exist.</returns>
+    public static bool IsPhotonViewMine(this MonoBehaviour mono)
+    {
+        PhotonView view = mono.GetPhotonView();
+
+        if (view)
+        {
+            return view.IsMine;
+        }
+        Debug.LogError("ERROR: Attempted to check if photonview on object " + mono.gameObject.name + " is mine, but view does not exist.");
+        return false;
+    }
 }

@@ -33,6 +33,8 @@ public class GameInstance : MonoBehaviour
 
     public LobbyPlayer myLobbyPlayer;
 
+    public GameplayPlayer myGameplayPlayer;
+
     #endregion
 
     private void Awake()

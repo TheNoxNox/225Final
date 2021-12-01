@@ -11,7 +11,7 @@ public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager Instance;
 
-
+    public string testLevelName = "TestArena";
 
     public List<LobbyPlayer> players = new List<LobbyPlayer>();
 
@@ -93,6 +93,15 @@ public class LobbyManager : MonoBehaviour
 
     #region host logic
 
+    public void StartGame()
+    {
+        if (GameInstance.Instance.IsHost)
+        {
+            Debug.Log("Joining using test string. Change this to desired level for finished product.");
+            PhotonNetwork.LoadLevel(testLevelName);
+        }
+    }
+
     //public void PlayerJoin(string playerID)
     //{
     //    gameObject.GetPhotonView().RPC("SendHostJoinNotification", RpcTarget.AllBufferedViaServer, playerID);
@@ -103,6 +112,11 @@ public class LobbyManager : MonoBehaviour
     //{
     //    gameObject.GetPhotonView().RPC("SendHostLeaveNotification", RpcTarget.AllBufferedViaServer, playerID);
     //}
+
+    #endregion
+
+
+    #region Game start methods
 
     #endregion
 
