@@ -20,16 +20,26 @@ public class Character : MonoBehaviour
     public float BaseJumpForce { get { return _baseJumpForce; } }
     public float JumpCount { get { return _baseJumpCount; } }
 
+    #region State Machine Info
+
+    #endregion
 
     #region movement component references
     [Header("Character Components")]
     [SerializeField]
     protected Rigidbody2D myRB;
+    public Rigidbody2D OwnRigidBody { get { return myRB; } }
 
     #endregion
 
     #region Movement Stored Variables
     private float xMovement;
+    #endregion
+
+    #region State Machine
+
+    public CharacterStateMachine myStateMachine;
+
     #endregion
 
     private void Awake()
