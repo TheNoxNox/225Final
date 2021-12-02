@@ -46,5 +46,13 @@ public class GameplayPlayer : MonoBehaviour
         }
     }
 
+    public void JumpCharacter()
+    {
+        if (myCharacter)
+        {
+            myCharacter.Jump();
+        }
+    }
+
     #endregion
 }

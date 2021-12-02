@@ -7,12 +7,18 @@ public class Character : MonoBehaviour
 {
     [Header("Character Attributes")]
     [SerializeField]
-    protected float _baseMovespeed = 4f;
+    protected string _name = "TestCharacter";
+    [SerializeField]
+    protected float _baseMovespeed = 100f;
+    //protected float _maxMoveSpeed =
     [SerializeField]
     protected float _baseJumpForce = 100f;
     [SerializeField]
     protected uint _baseJumpCount = 2;
+    public string Name { get { return _name; } }
     public float BaseSpeed { get { return _baseMovespeed; } }
+    public float BaseJumpForce { get { return _baseJumpForce; } }
+    public float JumpCount { get { return _baseJumpCount; } }
 
 
     #region movement component references
@@ -48,10 +54,15 @@ public class Character : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(xMovement > 0.1f)
+        if(Mathf.Abs(xMovement) > 0.1f)
         {
-
+            myRB.AddForce(new Vector2((xMovement * BaseSpeed) / 50, 0),ForceMode2D.Impulse);
+            //Debug.Log(myRB.velocity.x);
         }
+        //else
+        //{
+        //    myRB.velocity = new Vector2(myRB.velocity.x * 0.85f, myRB.velocity.y);
+        //}
     }
 
     #region Movement
@@ -59,6 +70,11 @@ public class Character : MonoBehaviour
     public void XMovement(float moveValue)
     {
         xMovement = moveValue;
+    }
+
+    public void Jump()
+    {
+        myRB.AddForce(new Vector2(0, BaseJumpForce), ForceMode2D.Impulse);
     }
 
     #endregion

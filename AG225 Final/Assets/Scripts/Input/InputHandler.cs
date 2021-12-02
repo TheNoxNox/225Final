@@ -24,4 +24,12 @@ public class InputHandler : MonoBehaviour
             GameplayManager.Instance.myPlayer.MoveCharacter(ctx.ReadValue<float>());
         }      
     }
+
+    public void PlayerJump(InputAction.CallbackContext ctx)
+    {
+        if (shouldSendInput && ctx.performed)
+        {
+            GameplayManager.Instance.myPlayer.JumpCharacter();
+        }
+    }
 }

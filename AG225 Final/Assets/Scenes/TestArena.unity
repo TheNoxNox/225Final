@@ -176,7 +176,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -232,8 +232,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 719504989}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.89, y: -1.1, z: 0}
-  m_LocalScale: {x: 3, y: 1, z: 1}
+  m_LocalPosition: {x: 7.611, y: -0.41605, z: 0}
+  m_LocalScale: {x: 4.69584, y: 1.6, z: 1.6}
   m_Children: []
   m_Father: {fileID: 1897245886}
   m_RootOrder: 1
@@ -391,7 +391,19 @@ MonoBehaviour:
     m_ActionId: 4200298d-db5b-4d00-b55c-92e461fcee5b
     m_ActionName: GameplayInput/Movement[/Keyboard/a,/Keyboard/d]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 915006071}
+        m_TargetAssemblyTypeName: InputHandler, Assembly-CSharp
+        m_MethodName: PlayerJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 4e7aa9b4-d034-4bd4-b792-bf5fb3faa51f
     m_ActionName: GameplayInput/Jump[/Keyboard/w]
   - m_PersistentCalls:
@@ -455,8 +467,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1761576095}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.38, y: -0.16, z: 0}
-  m_LocalScale: {x: 3, y: 1, z: 1}
+  m_LocalPosition: {x: -8.5698, y: 1.4231, z: 0}
+  m_LocalScale: {x: 4.69584, y: 1.6, z: 1.6}
   m_Children: []
   m_Father: {fileID: 1897245886}
   m_RootOrder: 2
@@ -597,8 +609,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2122325402}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3.47, z: 0}
-  m_LocalScale: {x: 15, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -5.0531, z: 0}
+  m_LocalScale: {x: 29.348999, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 1897245886}
   m_RootOrder: 0
