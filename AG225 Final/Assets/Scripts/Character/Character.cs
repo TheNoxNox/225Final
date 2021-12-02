@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
 [HelpURL("https://www.youtube.com/watch?v=w9NmPShzPpE")]
 public class Character : MonoBehaviour
@@ -18,7 +20,7 @@ public class Character : MonoBehaviour
     public string Name { get { return _name; } }
     public float BaseSpeed { get { return _baseMovespeed; } }
     public float BaseJumpForce { get { return _baseJumpForce; } }
-    public float JumpCount { get { return _baseJumpCount; } }
+    public float MaxJumpCount { get { return _baseJumpCount; } }
 
     #region State Machine Info
 
@@ -34,6 +36,8 @@ public class Character : MonoBehaviour
 
     #region Movement Stored Variables
     private float xMovement;
+    private uint currentJumps = 0;
+    public bool IsTouchingGround => IsGrounded();
     #endregion
 
     #region State Machine
@@ -41,6 +45,11 @@ public class Character : MonoBehaviour
     public CharacterStateMachine myStateMachine;
 
     #endregion
+
+    [Header("Misc Fields")]
+    [SerializeField]
+    protected LayerMask platformMask;
+    public BoxCollider2D groundCheckBox;
 
     private void Awake()
     {
@@ -84,7 +93,57 @@ public class Character : MonoBehaviour
 
     public void Jump()
     {
+        if(currentJumps < MaxJumpCount)
+        {
+            myStateMachine.currentJumpState.Jump();
+        }
+    }
+
+    public void DoJump()
+    {
         myRB.AddForce(new Vector2(0, BaseJumpForce), ForceMode2D.Impulse);
+        currentJumps++;
+    }
+
+    public void ResetJumps()
+    {
+        currentJumps = 0;
+    }
+
+    private bool IsGrounded()
+    {
+        RaycastHit2D groundCastHit = Physics2D.BoxCast(groundCheck,)
+    }
+
+    #endregion
+
+    #region RPC State Machine Sync Methods
+
+    /// <summary>
+    /// RPC for setting jump state across the network.
+    /// </summary>
+    /// <param name="stateName">This should be EXACTLY the name, no capitals, of the state following "Jump_" (Ex. "grounded")</param>
+    [PunRPC]
+    public void SetJumpState(string stateName)
+    {
+        switch (stateName)
+        {
+            case "liftoff":
+                myStateMachine.ChangeJumpState(myStateMachine.Jump_Liftoff);
+                break;
+            case "grounded":
+                myStateMachine.ChangeJumpState(myStateMachine.Jump_Grounded);
+                break;
+            case "landing":
+                myStateMachine.ChangeJumpState(myStateMachine.Jump_Landing);
+                break;
+            case "jumping":
+                myStateMachine.ChangeJumpState(myStateMachine.Jump_Jumping);
+                break;
+            case "falling":
+                myStateMachine.ChangeJumpState(myStateMachine.Jump_Falling);
+                break;
+        }
     }
 
     #endregion

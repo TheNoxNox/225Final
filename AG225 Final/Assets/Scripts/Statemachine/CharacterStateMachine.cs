@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class CharacterStateMachine : MonoBehaviour
 {
+    public Character MyCharacter;
+
     private void Awake()
     {
-        
+        currentJumpState = Jump_Grounded;
     }
 
     public JumpState currentJumpState;
@@ -32,7 +34,7 @@ public class CharacterStateMachine : MonoBehaviour
 
     private void Update()
     {
-        currentJumpState.PerformState();
+        currentJumpState?.PerformState();
     }
 
     public void ChangeJumpState(JumpState jState)

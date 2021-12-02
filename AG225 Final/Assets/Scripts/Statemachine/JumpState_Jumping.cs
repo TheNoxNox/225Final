@@ -2,17 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class JumpState_Jumping : MonoBehaviour
+public class JumpState_Jumping : JumpState
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void Jump()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        MyCharacter.DoJump();
+        MyCharacter.GetPhotonView().RPC("SetJumpState", Photon.Pun.RpcTarget.AllBufferedViaServer, "jumping");
     }
 }

@@ -2,17 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class JumpState_Grounded : MonoBehaviour
+public class JumpState_Grounded : JumpState
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void EnterState()
     {
-        
+        MyCharacter.ResetJumps();
+    }
+    public override void PerformState()
+    {
+        if(MyCharacter.OwnRigidBody.velocity.y <= -0.05)
+        {
+            MyCharacter.GetPhotonView().RPC("SetJumpState", Photon.Pun.RpcTarget.AllBufferedViaServer, "falling");
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void Jump()
     {
-        
+        MyCharacter.DoJump();
+        MyCharacter.GetPhotonView().RPC("SetJumpState", Photon.Pun.RpcTarget.AllBufferedViaServer, "liftoff");
     }
 }

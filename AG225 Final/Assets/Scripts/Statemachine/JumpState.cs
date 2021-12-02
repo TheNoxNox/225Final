@@ -4,15 +4,8 @@ using UnityEngine;
 
 public class JumpState : StateBase
 {
-    // Start is called before the first frame update
-    void Start()
+    public virtual void Jump()
     {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
