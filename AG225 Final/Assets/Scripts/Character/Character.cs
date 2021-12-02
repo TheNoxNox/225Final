@@ -37,7 +37,7 @@ public class Character : MonoBehaviour
     #region Movement Stored Variables
     private float xMovement;
     private uint currentJumps = 0;
-    public bool IsTouchingGround => IsGrounded();
+    public bool IsTouchingGround { get; private set; }
     #endregion
 
     #region State Machine
@@ -68,7 +68,7 @@ public class Character : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        IsTouchingGround = IsGrounded();
     }
 
     private void FixedUpdate()
@@ -101,6 +101,7 @@ public class Character : MonoBehaviour
 
     public void DoJump()
     {
+        myRB.velocity = new Vector2(myRB.velocity.x, myRB.velocity.y * 0.05f);
         myRB.AddForce(new Vector2(0, BaseJumpForce), ForceMode2D.Impulse);
         currentJumps++;
     }
@@ -110,9 +111,11 @@ public class Character : MonoBehaviour
         currentJumps = 0;
     }
 
+    //https://www.youtube.com/watch?v=c3iEl5AwUF8
     private bool IsGrounded()
     {
-        RaycastHit2D groundCastHit = Physics2D.BoxCast(groundCheck,)
+        RaycastHit2D groundCastHit = Physics2D.BoxCast(groundCheckBox.bounds.center, groundCheckBox.bounds.size, 0f, Vector2.down, 1f, platformMask);
+        return groundCastHit.collider != null;
     }
 
     #endregion

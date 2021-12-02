@@ -450,7 +450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 812576ed4529e364f9cbd16e90a3ee33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gameVersion: Alpha4
+  _gameVersion: Beta1
   _username: 
   _uniqueID: 
   lobby: Lobby
