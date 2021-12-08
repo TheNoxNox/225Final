@@ -142,12 +142,12 @@ public class Character : MonoBehaviour
         myRB.gravityScale *= -1f;
         if (!IsFlipped)
         {
-            transform.Rotate(new Vector3(0, 0, 180));
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, 180));
             _isFlipped = true;
         }
         else
         {
-            transform.Rotate(new Vector3(0, 0, -180));
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
             _isFlipped = false;
         }
     }
