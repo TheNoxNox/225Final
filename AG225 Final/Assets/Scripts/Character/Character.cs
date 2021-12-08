@@ -37,6 +37,7 @@ public class Character : MonoBehaviour
     #region Movement Stored Variables
     private float xMovement;
     private uint currentJumps = 0;
+    private bool facingRight = true;
     public bool IsTouchingGround { get; private set; }
     #endregion
 
@@ -52,6 +53,7 @@ public class Character : MonoBehaviour
     public BoxCollider2D groundCheckBox;
     private bool _isFlipped = false;
     public bool IsFlipped { get { return _isFlipped; } }
+    public GameObject sprite;
 
     private void Awake()
     {
@@ -100,6 +102,16 @@ public class Character : MonoBehaviour
     public void XMovement(float moveValue)
     {
         xMovement = moveValue;
+        if(moveValue < -0.1f && facingRight) 
+        {
+            transform.localScale = new Vector3(transform.localScale.x * -1f, transform.localScale.y, transform.localScale.z);
+            facingRight = false; 
+        }
+        else if(moveValue > 0.1f && !facingRight) 
+        { 
+            transform.localScale = new Vector3(transform.localScale.x * -1f,transform.localScale.y,transform.localScale.z); 
+            facingRight = true; 
+        }
     }
 
     public void Jump()
