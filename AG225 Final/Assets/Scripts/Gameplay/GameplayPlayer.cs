@@ -54,5 +54,13 @@ public class GameplayPlayer : MonoBehaviour
         }
     }
 
+    public void FlipCharacter()
+    {
+        if (myCharacter)
+        {
+            myCharacter.Flip();
+        }
+    }
+
     #endregion
 }

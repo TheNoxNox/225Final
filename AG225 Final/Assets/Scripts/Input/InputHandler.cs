@@ -32,4 +32,12 @@ public class InputHandler : MonoBehaviour
             GameplayManager.Instance.myPlayer.JumpCharacter();
         }
     }
+
+    public void PlayerFlip(InputAction.CallbackContext ctx)
+    {
+        if(shouldSendInput && ctx.performed)
+        {
+            GameplayManager.Instance.myPlayer.FlipCharacter();
+        }
+    }
 }

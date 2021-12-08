@@ -50,6 +50,8 @@ public class Character : MonoBehaviour
     [SerializeField]
     protected LayerMask platformMask;
     public BoxCollider2D groundCheckBox;
+    private bool _isFlipped = false;
+    public bool IsFlipped { get { return _isFlipped; } }
 
     private void Awake()
     {
@@ -75,7 +77,10 @@ public class Character : MonoBehaviour
     {
         if(Mathf.Abs(xMovement) > 0.1f)
         {
-            myRB.AddForce(new Vector2((xMovement * BaseSpeed) / 50, 0),ForceMode2D.Impulse);
+            float airMod = 1f;
+            if (!IsTouchingGround) { airMod = 0.75f; }
+
+            myRB.AddForce(new Vector2((xMovement * BaseSpeed * airMod) / 50, 0),ForceMode2D.Impulse);
             //Debug.Log(myRB.velocity.x);
         }
         //else
@@ -102,7 +107,7 @@ public class Character : MonoBehaviour
     public void DoJump()
     {
         myRB.velocity = new Vector2(myRB.velocity.x, myRB.velocity.y * 0.05f);
-        myRB.AddForce(new Vector2(0, BaseJumpForce), ForceMode2D.Impulse);
+        myRB.AddForce(new Vector2(0, BaseJumpForce * transform.up.y), ForceMode2D.Impulse);
         currentJumps++;
     }
 
@@ -119,6 +124,36 @@ public class Character : MonoBehaviour
     }
 
     #endregion
+
+
+    #region Flip logic
+
+    public void Flip()
+    {
+        if (this.GetPhotonView().IsMine)
+        {
+            this.GetPhotonView().RPC("FlipRPC", RpcTarget.AllBufferedViaServer);
+        }
+    }
+
+    [PunRPC]
+    public void FlipRPC()
+    {
+        myRB.gravityScale *= -1f;
+        if (!IsFlipped)
+        {
+            transform.Rotate(new Vector3(0, 0, 180));
+            _isFlipped = true;
+        }
+        else
+        {
+            transform.Rotate(new Vector3(0, 0, -180));
+            _isFlipped = false;
+        }
+    }
+
+    #endregion
+
 
     #region RPC State Machine Sync Methods
 
