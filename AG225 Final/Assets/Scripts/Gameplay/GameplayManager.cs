@@ -40,4 +40,15 @@ public class GameplayManager : MonoBehaviour
             myPlayer = GameInstance.Instance.myGameplayPlayer;
         }
     }
+
+    private void Update()
+    {
+        
+    }
+
+    public void FlipCamera(bool isFlipped)
+    {
+        if (isFlipped) { Camera.main.transform.rotation = Quaternion.Euler(0, 0, 180); }
+        else { Camera.main.transform.rotation = Quaternion.Euler(0, 0, 0); }
+    }
 }

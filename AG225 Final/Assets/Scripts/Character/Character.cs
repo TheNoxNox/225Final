@@ -75,14 +75,20 @@ public class Character : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(Mathf.Abs(xMovement) > 0.1f)
+        if (this.GetPhotonView().IsMine)
         {
-            float airMod = 1f;
-            if (!IsTouchingGround) { airMod = 0.75f; }
+            if (Mathf.Abs(xMovement) > 0.1f)
+            {
+                float airMod = 1f;
+                if (!IsTouchingGround) { airMod = 0.75f; }
+                float flipMod = 1f;
+                if (IsFlipped) { flipMod = -1f; }
 
-            myRB.AddForce(new Vector2((xMovement * BaseSpeed * airMod) / 50, 0),ForceMode2D.Impulse);
-            //Debug.Log(myRB.velocity.x);
+                myRB.AddForce(new Vector2((xMovement * BaseSpeed * airMod * flipMod) / 50, 0), ForceMode2D.Impulse);
+                //Debug.Log(myRB.velocity.x);
+            }
         }
+        
         //else
         //{
         //    myRB.velocity = new Vector2(myRB.velocity.x * 0.85f, myRB.velocity.y);
@@ -132,6 +138,7 @@ public class Character : MonoBehaviour
     {
         if (this.GetPhotonView().IsMine)
         {
+            GameplayManager.Instance.FlipCamera(!IsFlipped);
             this.GetPhotonView().RPC("FlipRPC", RpcTarget.AllBufferedViaServer);
         }
     }
