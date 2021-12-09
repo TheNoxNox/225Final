@@ -50,6 +50,8 @@ MonoBehaviour:
   - PlayerLeave
   - SetJumpState
   - FlipRPC
+  - CharacterDie
+  - UpdateTime
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

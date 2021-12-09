@@ -4,13 +4,19 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
+public enum Gamemode
+{
+    Stock = 0,
+    Timed = 1
+}
+
 public class GameInstance : MonoBehaviour
 {
     public static GameInstance Instance;
 
     #region host parameters
 
-    public bool IsHost { get; private set; }
+    public bool IsHost => PhotonNetwork.IsMasterClient;
 
 
 
@@ -35,6 +41,10 @@ public class GameInstance : MonoBehaviour
 
     public GameplayPlayer myGameplayPlayer;
 
+    public Gamemode _gamemode;
+
+    public string characterName = "TestCharacter";
+
     #endregion
 
     private void Awake()
@@ -48,8 +58,6 @@ public class GameInstance : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
-        IsHost = PhotonNetwork.IsMasterClient;
 
         //PlayerNetworkManager.OnDisconnect += PlayerLeaveLogic;
 
@@ -68,11 +76,6 @@ public class GameInstance : MonoBehaviour
         //gameObject.GetPhotonView().RPC("RemovePlayer", RpcTarget.AllBufferedViaServer, PlayerNetworkManager.Instance.UniqueID);
         RemovePlayer(PlayerNetworkManager.Instance.UniqueID);
         Destroy(this.gameObject);
-    }
-
-    private void Update()
-    {
-        IsHost = PhotonNetwork.IsMasterClient;
     }
 
     public void AddPlayer(string uName, string uID)

@@ -22,12 +22,26 @@ public class GameplayPlayer : MonoBehaviour
     [SerializeField]
     protected string _characterName = "TestCharacter";
     public string CharacterName { get { return _characterName; } }
+
+    public int playerNum;
+    #endregion
+
+    #region game score variables
+
+    private int _score = 0;
+
+    private int _stock = 3;
+
+
+
     #endregion
 
     private void Awake()
     {
         if (isViewMine)
         {
+            this.GetPhotonView().RPC("PlayerJoin", RpcTarget.AllBufferedViaServer, 
+                PlayerNetworkManager.Instance.Username, PlayerNetworkManager.Instance.UniqueID,GameInstance.Instance.characterName);
             if (PlayerNetworkManager.Instance.IsTestingMode)
             {
                 myCharacter = PhotonNetwork.Instantiate(CharacterName, Vector3.zero, Quaternion.identity).GetComponent<Character>();
@@ -36,7 +50,31 @@ public class GameplayPlayer : MonoBehaviour
         
     }
 
+    [PunRPC]
+    public void PlayerJoin(string username, string id, string charName)
+    {
+        _username = username;
+        _userID = id;
+        _characterName = charName;
+    }
+
+    private void OnDestroy()
+    {
+        //GameplayManager.Instance.PlayerLeave(this);
+    }
+
     #region Character Control Methods
+    public void SpawnCharacter()
+    {
+        myCharacter = PhotonNetwork.Instantiate(CharacterName, Vector3.zero, Quaternion.identity).GetComponent<Character>();
+    }
+
+    [PunRPC]
+    public void CharacterDie()
+    {
+
+    }
+
 
     public void MoveCharacter(float axisMovement)
     {

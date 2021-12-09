@@ -22,7 +22,7 @@ public class PlayerCardDisplay : MonoBehaviour
         CharacterID = "000";
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         usernameField.text = Username;
     }

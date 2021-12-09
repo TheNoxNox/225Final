@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 
 [HelpURL("https://www.youtube.com/watch?v=w9NmPShzPpE")]
 public class Character : MonoBehaviour
@@ -53,7 +54,14 @@ public class Character : MonoBehaviour
     public BoxCollider2D groundCheckBox;
     private bool _isFlipped = false;
     public bool IsFlipped { get { return _isFlipped; } }
-    public GameObject sprite;
+    public SpriteRenderer sprite;
+    public TMP_Text nametag;
+
+    #region attack hitboxes
+
+
+
+    #endregion
 
     private void Awake()
     {
