@@ -10,15 +10,13 @@ public class Character : MonoBehaviour
 {
     [Header("Character Attributes")]
     [SerializeField]
-    protected string _name = "TestCharacter";
-    [SerializeField]
     protected float _baseMovespeed = 100f;
     //protected float _maxMoveSpeed =
     [SerializeField]
     protected float _baseJumpForce = 100f;
     [SerializeField]
     protected uint _baseJumpCount = 2;
-    public string Name { get { return _name; } }
+    public string Name { get { return gameObject.name; } }
     public float BaseSpeed { get { return _baseMovespeed; } }
     public float BaseJumpForce { get { return _baseJumpForce; } }
     public float MaxJumpCount { get { return _baseJumpCount; } }

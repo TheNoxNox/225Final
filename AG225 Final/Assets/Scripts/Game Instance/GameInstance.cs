@@ -41,7 +41,7 @@ public class GameInstance : MonoBehaviour
 
     public GameplayPlayer myGameplayPlayer;
 
-    public Gamemode _gamemode;
+    public Gamemode _gamemode = Gamemode.Stock;
 
     public string characterName = "TestCharacter";
 
@@ -49,7 +49,7 @@ public class GameInstance : MonoBehaviour
 
     private void Awake()
     {
-        if (!Instance)
+        if (!Instance && PhotonNetwork.IsConnected)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
@@ -76,6 +76,20 @@ public class GameInstance : MonoBehaviour
         //gameObject.GetPhotonView().RPC("RemovePlayer", RpcTarget.AllBufferedViaServer, PlayerNetworkManager.Instance.UniqueID);
         RemovePlayer(PlayerNetworkManager.Instance.UniqueID);
         Destroy(this.gameObject);
+    }
+
+    [PunRPC]
+    public void SetGamemode(string gamemode)
+    {
+        switch (gamemode)
+        {
+            case "stock":
+                _gamemode = Gamemode.Stock;
+                break;
+            case "timed":
+                _gamemode = Gamemode.Timed;
+                break;
+        }
     }
 
     public void AddPlayer(string uName, string uID)

@@ -46,6 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myCharacter: {fileID: 0}
   _characterName: TestCharacter
+  playerNum: 0
+  myCard: {fileID: 0}
 --- !u!114 &-7288717351319964974
 MonoBehaviour:
   m_ObjectHideFlags: 0

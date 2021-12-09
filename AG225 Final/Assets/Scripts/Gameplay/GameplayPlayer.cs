@@ -29,10 +29,12 @@ public class GameplayPlayer : MonoBehaviour
     #region game score variables
 
     private int _score = 0;
+    public int Score { get { return _score; } }
 
     private int _stock = 3;
+    public int Stock { get { return _stock; } }
 
-
+    public GameplayCard myCard;
 
     #endregion
 
@@ -56,6 +58,13 @@ public class GameplayPlayer : MonoBehaviour
         _username = username;
         _userID = id;
         _characterName = charName;
+
+        myCard = GameplayManager.Instance.AddPlayer(this);
+    }
+
+    public void PlayerLeave()
+    {
+        GameplayManager.Instance.PlayerLeave(this);
     }
 
     private void OnDestroy()

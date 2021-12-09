@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
+using System;
 
 using Photon.Realtime;
 using Photon.Pun;
+using TMPro;
 
 public class GameplayManager : MonoBehaviour
 {
@@ -21,9 +23,15 @@ public class GameplayManager : MonoBehaviour
 
     public List<GameplayPlayer> players;
 
+    public List<GameplayCard> cards;
+
     public GameObject cardHolder;
 
     public GameObject playerCardPrefab;
+
+    public TMP_Text timer;
+
+    public MatchStats stats;
 
     private void Awake()
     {
@@ -51,30 +59,46 @@ public class GameplayManager : MonoBehaviour
 
     private void Update()
     {
-        
+        UpdateTimer();
     }
 
     public void PlayerLeave(GameplayPlayer player)
     {
-        foreach(GameplayPlayer p in players)
-        {
-            if(p.UserID == player.UserID)
-            {
-                
-            }
-        }
+        playerCount--;
+        cards.Remove(player.myCard);
+        Destroy(player.myCard.gameObject);
+        players.Remove(player);
     }
 
-    public void AddPlayer(GameplayPlayer player)
+    public GameplayCard AddPlayer(GameplayPlayer player)
     {
         playerCount++;
-        player.playerNum = playerCount;
-        players.Add(player);        
+
+        players.Add(player);
+
+        GameplayCard card = Instantiate(playerCardPrefab, cardHolder.transform).GetComponent<GameplayCard>();
+
+        card.Username = player.Username;
+        card.stockCount = player.Stock;
+        card.score = player.Score;
+
+        cards.Add(card);
+
+        return card;
     }
 
     public void FlipCamera(bool isFlipped)
     {
         if (isFlipped) { Camera.main.transform.rotation = Quaternion.Euler(0, 0, 180); }
         else { Camera.main.transform.rotation = Quaternion.Euler(0, 0, 0); }
+    }
+
+    private void UpdateTimer()
+    {
+        TimeSpan tSpan = TimeSpan.FromSeconds(stats.GameTime);
+
+        string tString = tSpan.ToString(@"m\:ss");
+
+        timer?.SetText(tString);
     }
 }

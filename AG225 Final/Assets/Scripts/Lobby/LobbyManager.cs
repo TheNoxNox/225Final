@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 using Photon.Pun;
 using Photon.Realtime;
@@ -31,6 +32,11 @@ public class LobbyManager : MonoBehaviour
     [Header("Lobby Info Display")]
     public TMP_Text playerCounter;
 
+    public TMP_Text gamemodeDisp;
+
+    public GameObject hostUI;
+
+    public Button startButton;
 
     #endregion
 
@@ -62,12 +68,9 @@ public class LobbyManager : MonoBehaviour
             return;
         }
 
-        Instantiate(gameInstancePrefab, Vector3.zero, Quaternion.identity);
+        //Instantiate(gameInstancePrefab, Vector3.zero, Quaternion.identity);
 
-        if (lobbyPlayerPrefab)
-        {
-            GameInstance.Instance.myLobbyPlayer = PhotonNetwork.Instantiate("LobbyPlayer", Vector3.zero, Quaternion.identity).GetComponent<LobbyPlayer>();
-        }
+        
 
         //GameInstance.OnPlayerJoin += PlayerJoin;
         //GameInstance.OnPlayerLeave += PlayerLeave;
@@ -77,9 +80,38 @@ public class LobbyManager : MonoBehaviour
         //gameObject.GetPhotonView().RPC("ShowPlayerJoin", RpcTarget.AllBufferedViaServer, PlayerNetworkManager.Instance.Username);
     }
 
+    private void Start()
+    {
+        if (lobbyPlayerPrefab)
+        {
+            GameInstance.Instance.myLobbyPlayer = PhotonNetwork.Instantiate("LobbyPlayer", Vector3.zero, Quaternion.identity).GetComponent<LobbyPlayer>();
+        }
+    }
+
     private void Update()
     {
         UpdatePlayerCount();
+
+        if(GameInstance.Instance._gamemode == Gamemode.Stock)
+        {
+            gamemodeDisp.text = "Current Gamemode: \n" + "Stock"; 
+        }
+        else
+        {
+            gamemodeDisp.text = "Current Gamemode: \n" + "Timed";
+        }
+
+        if (GameInstance.Instance.IsHost && !hostUI.activeSelf)
+        {
+            hostUI.SetActive(true);
+        }
+        else if(!GameInstance.Instance.IsHost && hostUI.activeSelf)
+        {
+            hostUI.SetActive(false);
+        }
+
+        if(playerCount < 2) { startButton.interactable = false; }
+        else { startButton.interactable = true; }
     }
 
     #region UI update methods
@@ -100,6 +132,11 @@ public class LobbyManager : MonoBehaviour
             Debug.Log("Joining using test string. Change this to desired level for finished product.");
             PhotonNetwork.LoadLevel(testLevelName);
         }
+    }
+
+    public void ChangeGamemode(string gm)
+    {
+        GameInstance.Instance.GetPhotonView().RPC("SetGamemode", RpcTarget.AllBufferedViaServer, gm);
     }
 
     //public void PlayerJoin(string playerID)

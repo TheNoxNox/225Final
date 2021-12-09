@@ -11,24 +11,16 @@ public class MatchStats : MonoBehaviour
 
     private float currentGameTime = 0f;
 
-    // Start is called before the first frame update
-    void Start()
-    {
+    public float GameTime { get { return currentGameTime; } }
 
+    private void Awake()
+    {
+        currentGameTime = GameTimeMax;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (GameInstance.Instance.IsHost)
-        {
-            this.GetPhotonView().RPC("UpdateTime", RpcTarget.AllBufferedViaServer, currentGameTime + Time.deltaTime);
-        }
-    }
-
-    [PunRPC]
-    public void UpdateTime(float newTime)
-    {
-        currentGameTime = newTime;
+        currentGameTime -= Time.deltaTime;
     }
 }
