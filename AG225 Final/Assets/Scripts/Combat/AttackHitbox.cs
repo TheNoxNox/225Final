@@ -49,14 +49,16 @@ public class AttackHitbox : MonoBehaviour
         me.canAttack = true;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (isActive)
         {
+            Debug.Log("Hit something while active");
             Character otherChar = collision.gameObject.GetComponent<Character>();
 
             if(otherChar && otherChar != me)
             {
+                Debug.Log("Character hit that isn't me");
                 otherChar.DealDamage(AttackDamage, me);
             }
         }

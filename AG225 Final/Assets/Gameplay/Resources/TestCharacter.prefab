@@ -823,6 +823,9 @@ MonoBehaviour:
   _baseMovespeed: 100
   _baseJumpForce: 45
   _baseJumpCount: 2
+  isInvincible: 0
+  invincibilityDur: 0.5
+  lastHitCharacter: {fileID: 0}
   myRB: {fileID: 5325495203113334228}
   myStateMachine: {fileID: 7095970729193183873}
   platformMask:

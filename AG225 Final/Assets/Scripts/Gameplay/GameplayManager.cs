@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using System;
+using UnityEngine.UI;
 
 using Photon.Realtime;
 using Photon.Pun;
@@ -35,7 +36,17 @@ public class GameplayManager : MonoBehaviour
 
     public MatchStats stats;
 
+    public Slider CDslider;
+
     bool _gameIsStarted = false;
+
+    public bool GameDone = false;
+
+    public GameObject winScreen;
+
+    public TMP_Text winnerName;
+
+    public TMP_Text winnerScoreStock;
 
     private void Awake()
     {
@@ -74,6 +85,11 @@ public class GameplayManager : MonoBehaviour
         }
 
         UpdateTimer();
+
+        if(stats.GameTime <= 0)
+        {
+            EndGame();
+        }
     }
 
     private void BeginGame()
@@ -83,6 +99,81 @@ public class GameplayManager : MonoBehaviour
             player.GetPhotonView().RPC("SpawnCharacterRPC", RpcTarget.All);
 
         }
+    }
+
+    private void EndGame()
+    {
+        Time.timeScale = 0;
+
+        if (GameInstance.Instance.IsHost)
+        {
+            List<GameplayPlayer> winnerCandidates = new List<GameplayPlayer>();
+            foreach (GameplayPlayer player in players)
+            {
+                if (!player.playerOut)
+                {
+                    winnerCandidates.Add(player);
+                }
+            }
+
+            GameplayPlayer winner = winnerCandidates[0] ?? null;
+            bool isTie = false;
+
+            if (GameInstance.Instance._gamemode == Gamemode.Stock)
+            {             
+                foreach (GameplayPlayer player in winnerCandidates)
+                {
+                    if (player.Stock > winner.Stock)
+                    {
+                        winner = player;
+                        isTie = false;
+                    }
+                    else if (player.Stock == winner.Stock)
+                    {
+                        isTie = true;
+                    }
+                }
+
+                foreach (GameplayPlayer player in players)
+                {
+                    player.GetPhotonView().RPC("GameEndDisplay", RpcTarget.All, winner.Username, winner.Stock, isTie);
+                }
+            }
+            else
+            {
+                foreach(GameplayPlayer player in winnerCandidates)
+                {
+                    if(player.Score > winner.Score)
+                    {
+                        winner = player;
+                        isTie = false;
+                    }
+                    else if(player.Score == winner.Score)
+                    {
+                        isTie = true;
+                    }
+                }
+
+                foreach(GameplayPlayer player in players)
+                {
+                    player.GetPhotonView().RPC("GameEndDisplay", RpcTarget.All, winner.Username, winner.Score, isTie);
+                }
+            }
+        }
+
+        
+
+        
+    }
+
+    public void DisplayWinner(string name, int scoreStock)
+    {
+
+    }
+
+    public void BackToLobby()
+    {
+        SceneManager.LoadScene("Lobby");
     }
 
     public void PlayerLeave(GameplayPlayer player)

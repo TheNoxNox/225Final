@@ -27,6 +27,6 @@ public class GameplayCard : PlayerCardDisplay
                 scoreStockText.text = "Score: " + myPlayer.Score.ToString();
                 break;
         }
-        healthText.text = "HP: " + (myPlayer.MyCharacter?.HitpointsCurrent.ToString() ?? "0");
+        healthText.text = "HP: " + myPlayer.PlayerHealth.ToString();
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.UI;
 
 public class GameplayPlayer : MonoBehaviour
 {
@@ -35,20 +36,71 @@ public class GameplayPlayer : MonoBehaviour
     private int _stock = 3;
     public int Stock { get { return _stock; } }
 
+    public float PlayerHealth { get; private set; }
+
     public GameplayCard myCard;
 
     #endregion
 
+    #region spawning & respawning
+
     private GameObject spawnPoint;
+
+    [SerializeField]
+    protected bool isPlayerDead = false;
+
+    [SerializeField]
+    protected float SpawnCooldown = 4.5f;
+    protected float _spawnCDremaining = 0f;
+
+    #endregion
+
+    public Slider flipCDSlider;
+
+    private bool flipOnCooldown = false;
+
+    [SerializeField]
+    private float flipCooldownMax = 6f;
+    private float flipTimer = 0;
+
+    public bool playerOut = false;
+
+    private bool gameDone => GameplayManager.Instance.GameDone;
 
     private void Awake()
     {
         if (isViewMine)
         {
             this.GetPhotonView().RPC("PlayerJoin", RpcTarget.AllBufferedViaServer, 
-                PlayerNetworkManager.Instance.Username, PlayerNetworkManager.Instance.UniqueID,GameInstance.Instance.characterName);            
+                PlayerNetworkManager.Instance.Username, PlayerNetworkManager.Instance.UniqueID,GameInstance.Instance.characterName);
+            flipTimer = flipCooldownMax;
+            flipCDSlider = GameplayManager.Instance.CDslider;
         }
         
+    }
+
+    private void Update()
+    {
+        if (isPlayerDead && !playerOut)
+        {
+            _spawnCDremaining -= Time.deltaTime;
+            if(_spawnCDremaining <= 0f)
+            {
+                SpawnCharacter();
+            }
+        }
+
+        if (flipOnCooldown)
+        {
+            flipTimer += Time.deltaTime;
+            if(flipTimer >= flipCooldownMax)
+            {
+                flipTimer = flipCooldownMax;
+                flipOnCooldown = false;
+            }
+        }
+
+        flipCDSlider.value = ((flipTimer / flipCooldownMax) * 100);
     }
 
     [PunRPC]
@@ -61,9 +113,14 @@ public class GameplayPlayer : MonoBehaviour
     {
         if (isViewMine)
         {
-            myCharacter = PhotonNetwork.Instantiate(CharacterName, spawnPoint.transform.position, Quaternion.identity).GetComponent<Character>();
+            myCharacter = PhotonNetwork.Instantiate(CharacterName, spawnPoint.transform.position, Quaternion.identity)?.GetComponent<Character>();
             myCharacter.GetPhotonView().RPC("SetNametag", RpcTarget.AllBufferedViaServer, Username);
+            this.GetPhotonView().RPC("UpdatePlayerHealthRPC", RpcTarget.AllBuffered, myCharacter.HitpointsCurrent);
+            MyCharacter.PlayerDamageTaken += UpdatePlayerCard;
+            MyCharacter.PlayerDeath += PlayerOnDeath;
+            myCharacter.PlayerGetKill += GetKill;
         }
+        isPlayerDead = false;
     }
 
     [PunRPC]
@@ -71,6 +128,64 @@ public class GameplayPlayer : MonoBehaviour
     {
         playerNum = pNumber + 1;
         spawnPoint = GameplayManager.Instance.spawnPts[pNumber];
+    }
+
+    public void UpdatePlayerCard(float playerHealth)
+    {
+        this.GetPhotonView().RPC("UpdatePlayerHealthRPC", RpcTarget.AllBuffered, playerHealth);
+    }
+
+    public void PlayerOnDeath()
+    {
+        if(GameInstance.Instance._gamemode == Gamemode.Stock)
+        {
+            _stock -= 1;
+            this.GetPhotonView().RPC("UpdatePlayerScoreOrStockRPC", RpcTarget.AllBuffered, Stock);
+        }
+        else
+        {           
+            myCharacter?.lastHitCharacter?.GetPhotonView().RPC("GetKillRPC", RpcTarget.AllBuffered);
+        }
+        PhotonNetwork.Destroy(myCharacter.gameObject);
+        isPlayerDead = true;
+        _spawnCDremaining = SpawnCooldown;
+
+        if(Stock <= 0)
+        {
+            playerOut = true;
+            this.GetPhotonView().RPC("PlayerOut", RpcTarget.AllBufferedViaServer);
+        }
+    }
+
+    [PunRPC]
+    public void PlayerOut()
+    {
+        playerOut = true;
+    }
+
+    public void GetKill()
+    {
+        _score += 1;
+        this.GetPhotonView().RPC("UpdatePlayerScoreOrStockRPC", RpcTarget.AllBuffered, Score);
+    }
+
+    [PunRPC]
+    public void UpdatePlayerHealthRPC(float playerHealth)
+    {
+        PlayerHealth = playerHealth;
+    }
+
+    [PunRPC]
+    public void UpdatePlayerScoreOrStockRPC(int scoreOrStock)
+    {
+        if (GameInstance.Instance._gamemode == Gamemode.Stock)
+        {
+            _stock = scoreOrStock;
+        }
+        else
+        {
+            _score = scoreOrStock;
+        }
     }
 
     [PunRPC]
@@ -86,7 +201,30 @@ public class GameplayPlayer : MonoBehaviour
 
     public void PlayerLeave()
     {
+        _stock = 0;
+        _score = 0;
+        this.GetPhotonView().RPC("PlayerOut", RpcTarget.AllBufferedViaServer);
+
+        this.GetPhotonView().RPC("UpdatePlayerScoreOrStockRPC", RpcTarget.AllBuffered, Stock);
+
         GameplayManager.Instance.PlayerLeave(this);
+    }
+
+    [PunRPC]
+    public void GameEndDisplay(string winnerName, int winnerScoreStock, bool isTie)
+    {
+        GameplayManager.Instance.winScreen.SetActive(true);
+        if (isTie)
+        {
+            GameplayManager.Instance.winnerName.text = "NONE: TIE";
+            GameplayManager.Instance.winnerScoreStock.text = "";
+        }
+        else
+        {
+            GameplayManager.Instance.winnerName.text = winnerName;
+            if(GameInstance.Instance._gamemode == Gamemode.Stock) { GameplayManager.Instance.winnerScoreStock.text = "Stock: " + winnerScoreStock; }
+            else { GameplayManager.Instance.winnerScoreStock.text = "Score: " + winnerScoreStock; }   
+        }
     }
 
     private void OnDestroy()
@@ -105,7 +243,7 @@ public class GameplayPlayer : MonoBehaviour
 
     public void MoveCharacter(float axisMovement)
     {
-        if (myCharacter)
+        if (myCharacter && !gameDone)
         {
             myCharacter.XMovement(axisMovement);
         }
@@ -113,7 +251,7 @@ public class GameplayPlayer : MonoBehaviour
 
     public void JumpCharacter()
     {
-        if (myCharacter)
+        if (myCharacter && !gameDone)
         {
             myCharacter.Jump();
         }
@@ -121,15 +259,17 @@ public class GameplayPlayer : MonoBehaviour
 
     public void FlipCharacter()
     {
-        if (myCharacter)
+        if (myCharacter && !flipOnCooldown && !gameDone)
         {
+            flipOnCooldown = true;
+            flipTimer = 0;
             myCharacter.Flip();
         }
     }
 
     public void AttackCharacter(Vector2 attackDir)
     {
-        if (myCharacter)
+        if (myCharacter && !gameDone)
         {
             myCharacter.PlayerAttack(attackDir);
         }

@@ -25,6 +25,14 @@ public class Character : MonoBehaviour
     public float MaxJumpCount { get { return _baseJumpCount; } }
     public float HitpointsCurrent { get { return _hitpointCurrent; } }
 
+    [SerializeField]
+    private bool isInvincible = false;
+    [SerializeField]
+    private float invincibilityDur = 0.5f;
+    private float invincCounter = 0f;
+
+    public Character lastHitCharacter;
+
     #region State Machine Info
 
     #endregion
@@ -69,6 +77,17 @@ public class Character : MonoBehaviour
 
     #endregion
 
+    #region events
+
+    public delegate void PlayerEventDelegate();
+    public delegate void PlayerDamageDelegate(float remainingHealth);
+
+    public event PlayerDamageDelegate PlayerDamageTaken;
+    public event PlayerEventDelegate PlayerDeath;
+    public event PlayerEventDelegate PlayerGetKill;
+
+    #endregion
+
     private void Awake()
     {
         if (!myRB)
@@ -76,6 +95,7 @@ public class Character : MonoBehaviour
             myRB = gameObject.GetComponent<Rigidbody2D>() ?? gameObject.AddComponent<Rigidbody2D>();
         }
         _hitpointCurrent = _hitpointMax;
+        this.GetPhotonView().RPC("UpdateHealthRPC", RpcTarget.OthersBuffered, _hitpointCurrent);
     }
 
     // Start is called before the first frame update
@@ -88,6 +108,17 @@ public class Character : MonoBehaviour
     void Update()
     {
         IsTouchingGround = IsGrounded();
+
+        if (isInvincible)
+        {
+            invincCounter += Time.deltaTime;
+            if(invincCounter >= invincibilityDur)
+            {
+                isInvincible = false;
+                sprite.color = new Color(1, 1, 1);
+                
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -112,9 +143,49 @@ public class Character : MonoBehaviour
         //}
     }
 
-    public void DealDamage(float damage, Character source)
+    public void DealDamage(float damage, Character source = null)
     {
+        if (!isInvincible && source != this)
+        {
+            isInvincible = true;
+            invincCounter = 0;
+            sprite.color = new Color(sprite.color.r, sprite.color.g * 0.3f, sprite.color.g * 0.3f);
+            lastHitCharacter = source;
+            if (this.GetPhotonView().IsMine)
+            {
+                _hitpointCurrent -= damage;
+                if(_hitpointCurrent <= 0)
+                {
+                    _hitpointCurrent = 0;
+                    Death(source);
+                }
+                PlayerDamageTaken?.Invoke(_hitpointCurrent);
+                this.GetPhotonView().RPC("UpdateHealthRPC", RpcTarget.OthersBuffered, _hitpointCurrent);
+            }
+            
 
+        }
+    }
+
+    [PunRPC]
+    public void UpdateHealthRPC(float newHealth)
+    {
+        _hitpointCurrent = newHealth;
+    }
+
+    private void Death(Character source = null)
+    {
+        PlayerDeath?.Invoke();
+    }
+
+    [PunRPC]
+    public void GetKillRPC()
+    {
+        if (this.GetPhotonView().IsMine)
+        {
+            PlayerGetKill?.Invoke();
+        }
+        
     }
 
     #region Movement
