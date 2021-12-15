@@ -68,6 +68,8 @@ public class LobbyManager : MonoBehaviour
             return;
         }
 
+        PhotonNetwork.CurrentRoom.IsOpen = true;
+
         //Instantiate(gameInstancePrefab, Vector3.zero, Quaternion.identity);
 
         
@@ -130,6 +132,7 @@ public class LobbyManager : MonoBehaviour
         if (GameInstance.Instance.IsHost)
         {
             Debug.Log("Joining using test string. Change this to desired level for finished product.");
+            PhotonNetwork.CurrentRoom.IsOpen = false;
             PhotonNetwork.LoadLevel(testLevelName);
         }
     }

@@ -94,6 +94,7 @@ public class PlayerNetworkManager : MonoBehaviourPunCallbacks
             Destroy(this.gameObject);
         }
 
+        PhotonNetwork.SendRate = 120;
         PhotonNetwork.AutomaticallySyncScene = true;
         _roomOptions.MaxPlayers = 4;
 

@@ -10,8 +10,11 @@ public class Character : MonoBehaviour
 {
     [Header("Character Attributes")]
     [SerializeField]
+    protected float _hitpointMax = 100f;
+    [SerializeField]
+    protected float _hitpointCurrent = 100f;
+    [SerializeField]
     protected float _baseMovespeed = 100f;
-    //protected float _maxMoveSpeed =
     [SerializeField]
     protected float _baseJumpForce = 100f;
     [SerializeField]
@@ -20,6 +23,7 @@ public class Character : MonoBehaviour
     public float BaseSpeed { get { return _baseMovespeed; } }
     public float BaseJumpForce { get { return _baseJumpForce; } }
     public float MaxJumpCount { get { return _baseJumpCount; } }
+    public float HitpointsCurrent { get { return _hitpointCurrent; } }
 
     #region State Machine Info
 
@@ -56,8 +60,12 @@ public class Character : MonoBehaviour
     public TMP_Text nametag;
 
     #region attack hitboxes
+    public bool canAttack = true;
 
-
+    public AttackHitbox upAttack;
+    public AttackHitbox leftAttack;
+    public AttackHitbox rightAttack;
+    public AttackHitbox downAttack;
 
     #endregion
 
@@ -67,6 +75,7 @@ public class Character : MonoBehaviour
         {
             myRB = gameObject.GetComponent<Rigidbody2D>() ?? gameObject.AddComponent<Rigidbody2D>();
         }
+        _hitpointCurrent = _hitpointMax;
     }
 
     // Start is called before the first frame update
@@ -103,6 +112,11 @@ public class Character : MonoBehaviour
         //}
     }
 
+    public void DealDamage(float damage, Character source)
+    {
+
+    }
+
     #region Movement
 
     public void XMovement(float moveValue)
@@ -110,13 +124,71 @@ public class Character : MonoBehaviour
         xMovement = moveValue;
         if(moveValue < -0.1f && facingRight) 
         {
-            transform.localScale = new Vector3(transform.localScale.x * -1f, transform.localScale.y, transform.localScale.z);
+            //transform.localScale = new Vector3(transform.localScale.x * -1f, transform.localScale.y, transform.localScale.z);
+            this.GetPhotonView().RPC("SpriteFlip", RpcTarget.All, true);
             facingRight = false; 
         }
         else if(moveValue > 0.1f && !facingRight) 
-        { 
-            transform.localScale = new Vector3(transform.localScale.x * -1f,transform.localScale.y,transform.localScale.z); 
+        {
+            //transform.localScale = new Vector3(transform.localScale.x * -1f,transform.localScale.y,transform.localScale.z); 
+            this.GetPhotonView().RPC("SpriteFlip", RpcTarget.All, false);
             facingRight = true; 
+        }
+    }
+
+    [PunRPC]
+    public void SpriteFlip(bool flip)
+    {
+        sprite.flipX = flip;
+    }
+
+    public void PlayerAttack(Vector2 attackDir)
+    {
+        float xDir = attackDir.x;
+        float yDir = attackDir.y;
+        if (canAttack)
+        {
+            if (xDir <= -0.1f)
+            {
+                this.GetPhotonView().RPC("DoAttack", RpcTarget.AllViaServer, 0);
+                canAttack = false;
+            }
+            else if(xDir >= 0.1f)
+            {
+                this.GetPhotonView().RPC("DoAttack", RpcTarget.AllViaServer, 1);
+                canAttack = false;
+            }
+            else if(yDir >= 0.1f)
+            {
+                this.GetPhotonView().RPC("DoAttack", RpcTarget.AllViaServer, 2);
+                canAttack = false;
+            }
+            else if(yDir <= 0.1f && !IsTouchingGround)
+            {
+                this.GetPhotonView().RPC("DoAttack", RpcTarget.AllViaServer, 3);
+                canAttack = false;
+            }
+        }
+       
+    }
+
+    [PunRPC]
+    public void DoAttack(int direction)
+    {
+        switch (direction)
+        {
+            case 0:
+                leftAttack.Activate();
+                break;
+            case 1:
+                rightAttack.Activate();
+                break;
+            case 2:
+                upAttack.Activate();
+                break;
+            case 3:
+                downAttack.Activate();
+                break;
         }
     }
 
@@ -149,6 +221,19 @@ public class Character : MonoBehaviour
 
     #endregion
 
+    [PunRPC]
+    public void SetNametag(string name)
+    {
+        if (this.GetPhotonView().IsMine)
+        {
+            nametag.text = "YOU";
+            nametag.color = Color.red;
+        }
+        else
+        {
+            nametag.text = name;
+        }
+    }
 
     #region Flip logic
 

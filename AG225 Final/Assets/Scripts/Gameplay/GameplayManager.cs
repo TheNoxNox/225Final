@@ -25,6 +25,8 @@ public class GameplayManager : MonoBehaviour
 
     public List<GameplayCard> cards;
 
+    public List<GameObject> spawnPts;
+
     public GameObject cardHolder;
 
     public GameObject playerCardPrefab;
@@ -32,6 +34,8 @@ public class GameplayManager : MonoBehaviour
     public TMP_Text timer;
 
     public MatchStats stats;
+
+    bool _gameIsStarted = false;
 
     private void Awake()
     {
@@ -59,7 +63,26 @@ public class GameplayManager : MonoBehaviour
 
     private void Update()
     {
+        if (!_gameIsStarted && GameInstance.Instance.IsHost)
+        {
+            if(playerCount == PhotonNetwork.CurrentRoom.PlayerCount)
+            {
+                
+                BeginGame();
+                _gameIsStarted = true;
+            }
+        }
+
         UpdateTimer();
+    }
+
+    private void BeginGame()
+    {
+        foreach (GameplayPlayer player in players)
+        {
+            player.GetPhotonView().RPC("SpawnCharacterRPC", RpcTarget.All);
+
+        }
     }
 
     public void PlayerLeave(GameplayPlayer player)
@@ -72,6 +95,11 @@ public class GameplayManager : MonoBehaviour
 
     public GameplayCard AddPlayer(GameplayPlayer player)
     {
+        if (GameInstance.Instance.IsHost)
+        {
+            player.GetPhotonView().RPC("SetPlayerNumber", RpcTarget.AllBufferedViaServer, playerCount);
+        }
+
         playerCount++;
 
         players.Add(player);
@@ -82,7 +110,7 @@ public class GameplayManager : MonoBehaviour
         card.stockCount = player.Stock;
         card.score = player.Score;
 
-        cards.Add(card);
+        cards.Add(card);        
 
         return card;
     }

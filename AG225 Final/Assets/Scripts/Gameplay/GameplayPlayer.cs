@@ -12,6 +12,7 @@ public class GameplayPlayer : MonoBehaviour
 
     [SerializeField]
     protected Character myCharacter;
+    public Character MyCharacter { get { return myCharacter; } }
 
     #region player identification variables
     protected string _username = "DEFAULT_USER";
@@ -38,18 +39,38 @@ public class GameplayPlayer : MonoBehaviour
 
     #endregion
 
+    private GameObject spawnPoint;
+
     private void Awake()
     {
         if (isViewMine)
         {
             this.GetPhotonView().RPC("PlayerJoin", RpcTarget.AllBufferedViaServer, 
-                PlayerNetworkManager.Instance.Username, PlayerNetworkManager.Instance.UniqueID,GameInstance.Instance.characterName);
-            if (PlayerNetworkManager.Instance.IsTestingMode)
-            {
-                myCharacter = PhotonNetwork.Instantiate(CharacterName, Vector3.zero, Quaternion.identity).GetComponent<Character>();
-            }
+                PlayerNetworkManager.Instance.Username, PlayerNetworkManager.Instance.UniqueID,GameInstance.Instance.characterName);            
         }
         
+    }
+
+    [PunRPC]
+    public void SpawnCharacterRPC()
+    {
+        SpawnCharacter();
+    }
+
+    public void SpawnCharacter()
+    {
+        if (isViewMine)
+        {
+            myCharacter = PhotonNetwork.Instantiate(CharacterName, spawnPoint.transform.position, Quaternion.identity).GetComponent<Character>();
+            myCharacter.GetPhotonView().RPC("SetNametag", RpcTarget.AllBufferedViaServer, Username);
+        }
+    }
+
+    [PunRPC]
+    public void SetPlayerNumber(int pNumber)
+    {
+        playerNum = pNumber + 1;
+        spawnPoint = GameplayManager.Instance.spawnPts[pNumber];
     }
 
     [PunRPC]
@@ -60,6 +81,7 @@ public class GameplayPlayer : MonoBehaviour
         _characterName = charName;
 
         myCard = GameplayManager.Instance.AddPlayer(this);
+        myCard.myPlayer = this;
     }
 
     public void PlayerLeave()
@@ -73,10 +95,6 @@ public class GameplayPlayer : MonoBehaviour
     }
 
     #region Character Control Methods
-    public void SpawnCharacter()
-    {
-        myCharacter = PhotonNetwork.Instantiate(CharacterName, Vector3.zero, Quaternion.identity).GetComponent<Character>();
-    }
 
     [PunRPC]
     public void CharacterDie()
@@ -106,6 +124,14 @@ public class GameplayPlayer : MonoBehaviour
         if (myCharacter)
         {
             myCharacter.Flip();
+        }
+    }
+
+    public void AttackCharacter(Vector2 attackDir)
+    {
+        if (myCharacter)
+        {
+            myCharacter.PlayerAttack(attackDir);
         }
     }
 

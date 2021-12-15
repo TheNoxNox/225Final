@@ -52,6 +52,13 @@ MonoBehaviour:
   - FlipRPC
   - CharacterDie
   - UpdateTime
+  - SetGamemode
+  - SetPlayerNumber
+  - SpawnCharacter
+  - SpawnCharacterRPC
+  - SetNametag
+  - DoAttack
+  - SpriteFlip
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

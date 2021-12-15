@@ -40,4 +40,12 @@ public class InputHandler : MonoBehaviour
             GameplayManager.Instance.myPlayer.FlipCharacter();
         }
     }
+
+    public void PlayerAttack(InputAction.CallbackContext ctx)
+    {
+        if (shouldSendInput && ctx.performed)
+        {
+            GameplayManager.Instance.myPlayer.AttackCharacter(ctx.ReadValue<Vector2>());
+        }
+    }
 }

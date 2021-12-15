@@ -59,7 +59,7 @@ public class GameInstance : MonoBehaviour
             Destroy(gameObject);
         }
 
-        //PlayerNetworkManager.OnDisconnect += PlayerLeaveLogic;
+        PlayerNetworkManager.OnDisconnect += PlayerLeaveLogic;
 
         //PlayerJoinLogic();
     }
@@ -74,7 +74,7 @@ public class GameInstance : MonoBehaviour
     private void PlayerLeaveLogic()
     {
         //gameObject.GetPhotonView().RPC("RemovePlayer", RpcTarget.AllBufferedViaServer, PlayerNetworkManager.Instance.UniqueID);
-        RemovePlayer(PlayerNetworkManager.Instance.UniqueID);
+        //RemovePlayer(PlayerNetworkManager.Instance.UniqueID);
         Destroy(this.gameObject);
     }
 
