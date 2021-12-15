@@ -22,5 +22,9 @@ public class MatchStats : MonoBehaviour
     void Update()
     {
         currentGameTime -= Time.deltaTime;
+        if(currentGameTime <= 0)
+        {
+            currentGameTime = 0;
+        }
     }
 }

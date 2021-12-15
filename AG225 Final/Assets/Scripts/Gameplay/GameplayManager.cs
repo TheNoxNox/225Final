@@ -105,7 +105,7 @@ public class GameplayManager : MonoBehaviour
     {
         Time.timeScale = 0;
 
-        if (GameInstance.Instance.IsHost)
+        if (true)
         {
             List<GameplayPlayer> winnerCandidates = new List<GameplayPlayer>();
             foreach (GameplayPlayer player in players)
@@ -134,10 +134,11 @@ public class GameplayManager : MonoBehaviour
                     }
                 }
 
-                foreach (GameplayPlayer player in players)
-                {
-                    player.GetPhotonView().RPC("GameEndDisplay", RpcTarget.All, winner.Username, winner.Stock, isTie);
-                }
+                //foreach (GameplayPlayer player in players)
+                //{
+                //    player.GetPhotonView().RPC("GameEndDisplay", RpcTarget.AllBuffered, winner.Username, winner.Stock, isTie);
+                //}
+                GameInstance.Instance.myGameplayPlayer.GameEndDisplay(winner.Username, winner.Stock, isTie);
             }
             else
             {
@@ -154,10 +155,11 @@ public class GameplayManager : MonoBehaviour
                     }
                 }
 
-                foreach(GameplayPlayer player in players)
-                {
-                    player.GetPhotonView().RPC("GameEndDisplay", RpcTarget.All, winner.Username, winner.Score, isTie);
-                }
+                //foreach(GameplayPlayer player in players)
+                //{
+                //    player.GetPhotonView().RPC("GameEndDisplay", RpcTarget.AllBuffered, winner.Username, winner.Score, isTie);
+                //}
+                GameInstance.Instance.myGameplayPlayer.GameEndDisplay(winner.Username, winner.Score, isTie);
             }
         }
 
@@ -173,7 +175,7 @@ public class GameplayManager : MonoBehaviour
 
     public void BackToLobby()
     {
-        SceneManager.LoadScene("Lobby");
+        PlayerNetworkManager.Instance.LeaveRoom();
     }
 
     public void PlayerLeave(GameplayPlayer player)

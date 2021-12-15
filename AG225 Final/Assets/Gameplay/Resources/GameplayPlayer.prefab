@@ -47,7 +47,14 @@ MonoBehaviour:
   myCharacter: {fileID: 0}
   _characterName: TestCharacter
   playerNum: 0
+  _score: 0
+  _stock: 3
   myCard: {fileID: 0}
+  isPlayerDead: 0
+  SpawnCooldown: 4.5
+  flipCDSlider: {fileID: 0}
+  flipCooldownMax: 6
+  playerOut: 0
 --- !u!114 &-7288717351319964974
 MonoBehaviour:
   m_ObjectHideFlags: 0

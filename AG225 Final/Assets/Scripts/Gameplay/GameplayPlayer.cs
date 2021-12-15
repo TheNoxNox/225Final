@@ -30,9 +30,11 @@ public class GameplayPlayer : MonoBehaviour
 
     #region game score variables
 
+    [SerializeField]
     private int _score = 0;
     public int Score { get { return _score; } }
 
+    [SerializeField]
     private int _stock = 3;
     public int Stock { get { return _stock; } }
 
@@ -100,7 +102,12 @@ public class GameplayPlayer : MonoBehaviour
             }
         }
 
-        flipCDSlider.value = ((flipTimer / flipCooldownMax) * 100);
+        if (this.GetPhotonView().IsMine)
+        {
+            flipCDSlider.value = ((flipTimer / flipCooldownMax) * 100);
+        }
+
+        
     }
 
     [PunRPC]
@@ -210,21 +217,12 @@ public class GameplayPlayer : MonoBehaviour
         GameplayManager.Instance.PlayerLeave(this);
     }
 
-    [PunRPC]
     public void GameEndDisplay(string winnerName, int winnerScoreStock, bool isTie)
     {
         GameplayManager.Instance.winScreen.SetActive(true);
-        if (isTie)
-        {
-            GameplayManager.Instance.winnerName.text = "NONE: TIE";
-            GameplayManager.Instance.winnerScoreStock.text = "";
-        }
-        else
-        {
-            GameplayManager.Instance.winnerName.text = winnerName;
-            if(GameInstance.Instance._gamemode == Gamemode.Stock) { GameplayManager.Instance.winnerScoreStock.text = "Stock: " + winnerScoreStock; }
-            else { GameplayManager.Instance.winnerScoreStock.text = "Score: " + winnerScoreStock; }   
-        }
+        GameplayManager.Instance.winnerName.text = winnerName;
+        if (GameInstance.Instance._gamemode == Gamemode.Stock) { GameplayManager.Instance.winnerScoreStock.text = "Stock: " + winnerScoreStock; }
+        else { GameplayManager.Instance.winnerScoreStock.text = "Score: " + winnerScoreStock; }
     }
 
     private void OnDestroy()
